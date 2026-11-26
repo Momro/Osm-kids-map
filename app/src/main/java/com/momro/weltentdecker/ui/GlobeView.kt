@@ -45,12 +45,12 @@ private const val GLOBE_SIZE = 768
 @Composable
 fun GlobeOverlay(texture: Bitmap, onTap: () -> Unit = {}, modifier: Modifier = Modifier) {
     var phase by remember { mutableStateOf(0f) }
-    val texW = texture.width
+    val texWf = texture.width.toFloat()
 
     LaunchedEffect(texture) {
         while (true) {
             delay(66)
-            phase = (phase + 2f) % texW
+            phase = (phase + 2f) % texWf
         }
     }
 
@@ -68,8 +68,8 @@ fun GlobeOverlay(texture: Bitmap, onTap: () -> Unit = {}, modifier: Modifier = M
                     detectDragGestures { change, drag ->
                         change.consume()
                         val d = minOf(size.width, size.height)
-                        val v = phase + drag.x * texW / (PI * d)
-                        phase = ((v % texW) + texW) % texW
+                        val v = phase + drag.x * texWf / (PI.toFloat() * d)
+                        phase = ((v % texWf) + texWf) % texWf
                     }
                 }
         )
@@ -89,6 +89,7 @@ private fun renderGlobeBitmap(texture: Bitmap, phaseTex: Float, outSize: Int = G
     val canvas = AndroidCanvas(out)
     val r = outSize / 2f
     val texW = texture.width
+    val texWf = texW.toFloat()
     val texH = texture.height
 
     val glowPaint = Paint().apply {
@@ -113,8 +114,8 @@ private fun renderGlobeBitmap(texture: Bitmap, phaseTex: Float, outSize: Int = G
         val u = (i + step / 2f - r) / r
         if (u > -1f && u < 1f) {
             val lon = asin(u.toDouble())
-            val raw = ((lon + PI) / (2.0 * PI)).toFloat() * texW + phaseTex
-            val texCenter = ((raw % texW) + texW) % texW
+            val raw = ((lon + PI) / (2.0 * PI)).toFloat() * texWf + phaseTex
+            val texCenter = ((raw % texWf) + texWf) % texWf
             val cosLon = cos(lon).toFloat().coerceAtLeast(0.05f)
             val dTex = (texW / (2.0 * PI * r * cosLon) * step).toFloat()
             val left = floor((texCenter - dTex / 2).toDouble()).toInt().coerceIn(0, texW - 1)
