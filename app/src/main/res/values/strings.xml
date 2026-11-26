@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Welt-Entdecker</string>
+    <string name="search_hint">Ort suchen … z. B. Berlin</string>
+    <string name="search_cd">Suchen</string>
+    <string name="zoom_in_cd">Vergrößern</string>
+    <string name="zoom_out_cd">Verkleinern</string>
+    <string name="locate_cd">Wo bin ich?</string>
+    <string name="info_cd">Info und Datenschutz</string>
+    <string name="results_title">Gefunden! Tippe auf einen Ort:</string>
+    <string name="nothing_found">Nichts gefunden 😕</string>
+    <string name="no_gps">Kein Standort gefunden 😕</string>
+    <string name="you_are_here">Du bist hier!</string>
+    <string name="permission_denied">Ohne Standort-Erlaubnis kann ich nicht zeigen, wo du bist 😕</string>
+    <string name="info_title">Über diese App</string>
+    <string name="info_message">Welt-Entdecker ist eine kostenlose Karten-App für Kinder – eine Alternative zu Google Earth.\n\n• Kein Login, keine Werbung, kein Tracking – es werden keine Daten gesammelt oder verschickt.\n• Dein Standort wird nur lokal auf der Karte angezeigt und nicht gespeichert.\n• Karten: © OpenStreetMap-Mitwirkende (ODbL), Kacheln von openstreetmap.org\n• Ortssuche: Nominatim (OpenStreetMap)\n\nTipp: Zoome mit zwei Fingern oder den großen +/−-Knöpfen!</string>
+    <string name="close">Schließen</string>
+</resources>
