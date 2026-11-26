@@ -89,7 +89,7 @@ private val topoTileSource = object : OnlineTileSourceBase(
     )
 ) {
     override fun getTileURLString(pMapTileIndex: Long): String =
-        "$baseUrl${MapTileIndex.getLevel(pMapTileIndex)}/${MapTileIndex.getX(pMapTileIndex)}/${MapTileIndex.getY(pMapTileIndex)}.png"
+        "$baseUrl${MapTileIndex.getZoom(pMapTileIndex)}/${MapTileIndex.getX(pMapTileIndex)}/${MapTileIndex.getY(pMapTileIndex)}.png"
 }
 
 private val chips = listOf(
