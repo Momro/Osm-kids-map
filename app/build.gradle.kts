@@ -29,7 +29,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            if (System.getenv("KEYSTORE_BASE64") != null) {
+            if (System.getenv("KEYSTORE_BASE64")?.isNotEmpty() == true) {
                 signingConfig = signingConfigs.getByName("release")
             }
             proguardFiles(
