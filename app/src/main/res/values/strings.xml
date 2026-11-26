@@ -15,4 +15,5 @@
     <string name="info_title">Über diese App</string>
     <string name="info_message">Welt-Entdecker ist eine kostenlose Karten-App für Kinder – eine Alternative zu Google Earth.\n\n• Kein Login, keine Werbung, kein Tracking – es werden keine Daten gesammelt oder verschickt.\n• Dein Standort wird nur lokal auf der Karte angezeigt und nicht gespeichert.\n• Karten: © OpenStreetMap-Mitwirkende (ODbL), Kacheln von openstreetmap.org\n• Ortssuche: Nominatim (OpenStreetMap)\n\nTipp: Zoome mit zwei Fingern oder den großen +/−-Knöpfen!</string>
     <string name="close">Schließen</string>
+    <string name="globe_hint">🌍 Zieh ran, um die Welt zu entdecken!</string>
 </resources>

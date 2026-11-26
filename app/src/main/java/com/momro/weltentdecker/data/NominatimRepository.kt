@@ -14,7 +14,7 @@ class NominatimRepository {
     suspend fun search(query: String): List<SearchResult> = withContext(Dispatchers.IO) {
         val encoded = URLEncoder.encode(query, "UTF-8")
         val url = "https://nominatim.openstreetmap.org/search" +
-            "?format=jsonv2&limit=8&countrycodes=de&accept-language=de&q=$encoded"
+            "?format=jsonv2&limit=8&accept-language=de&q=$encoded"
         try {
             val conn = URL(url).openConnection() as HttpURLConnection
             conn.requestMethod = "GET"

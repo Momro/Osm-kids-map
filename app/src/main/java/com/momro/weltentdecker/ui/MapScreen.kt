@@ -1,6 +1,7 @@
 package com.momro.weltentdecker.ui
 
 import android.Manifest
+import android.graphics.BitmapFactory
 import android.location.Location
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -64,6 +65,9 @@ import com.momro.weltentdecker.data.NominatimRepository
 import com.momro.weltentdecker.data.SearchResult
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
@@ -76,7 +80,8 @@ private val chips = listOf(
     ChipItem("🌳 Spielplatz", "Spielplatz"),
     ChipItem("🏰 Schloss", "Schloss"),
     ChipItem("🎢 Freizeitpark", "Freizeitpark"),
-    ChipItem("🐠 Aquarium", "Aquarium"),
+    ChipItem("🏙️ Hochhaus", "Wolkenkratzer"),
+    ChipItem("🏛️ Akropolis", "Akropolis"),
 )
 
 @Composable
@@ -93,6 +98,8 @@ fun MapScreen() {
     var showInfo by remember { mutableStateOf(false) }
     var searchMarker by remember { mutableStateOf<Marker?>(null) }
     var hereMarker by remember { mutableStateOf<Marker?>(null) }
+    var showGlobe by remember { mutableStateOf(false) }
+    val earthTexture = remember { BitmapFactory.decodeResource(context.resources, R.drawable.earth) }
 
     fun doSearch(term: String = query) {
         val q = term.trim()
@@ -189,10 +196,18 @@ fun MapScreen() {
                     setTileSource(TileSourceFactory.MAPNIK)
                     setMultiTouchControls(true)
                     setBuiltInZoomControls(false)
-                    minZoomLevel = 4.0
+                    minZoomLevel = 3.0
                     maxZoomLevel = 19.0
                     controller.setZoom(6.0)
                     controller.setCenter(GeoPoint(51.1657, 10.4515))
+                    addMapListener(object : MapListener {
+                        override fun onZoom(event: ZoomEvent?): Boolean {
+                            showGlobe = zoomLevelDouble < 5.0
+                            return false
+                        }
+
+                        override fun onScroll(event: ScrollEvent?): Boolean = false
+                    })
                 }.also { mapView = it }
             },
             update = { mapView = it }
@@ -201,6 +216,10 @@ fun MapScreen() {
         DisposableEffect(mapView) {
             mapView?.onResume()
             onDispose { mapView?.onPause() }
+        }
+
+        if (showGlobe && earthTexture != null) {
+            GlobeOverlay(texture = earthTexture, modifier = Modifier.fillMaxSize())
         }
 
         Column(

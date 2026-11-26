@@ -6,9 +6,10 @@ Kinderfreundliche Karten-App als Alternative zu Google Earth – mit Karten von 
 ## Funktionen
 
 - Vollbild-Karte mit OpenStreetMap-Kacheln (osmdroid, Mapnik)
+- **3D-Globus**: Zoomt man weit genug raus (Zoom < 5), erscheint eine Erdkugel im Weltraum – ranzoomen oder + drücken holt die Karte zurück
 - Große, einfache Knöpfe: **+ / −** (Zoomen) und **„Wo bin ich?"** (Standort wird nur lokal angezeigt)
 - Zoomen auch per Zwei-Finger-Geste
-- Ortssuche (Nominatim/OpenStreetMap) plus Kinder-Chips: 🦁 Zoo, 🌳 Spielplatz, 🏰 Schloss, 🎢 Freizeitpark, 🐠 Aquarium
+- Ortssuche (Nominatim/OpenStreetMap) plus Kinder-Chips: 🦁 Zoo, 🌳 Spielplatz, 🏰 Schloss, 🎢 Freizeitpark, 🏙️ Hochhaus, 🏛️ Akropolis
 - Bunte Marker für gefundene Orte („Du bist hier!"-Punkt für den eigenen Standort)
 - Info-Dialog mit Datenschutz-Hinweisen
 
@@ -33,6 +34,8 @@ app/
     ui/theme/Theme.kt             # freundliches Material-3-Farbschema
     data/NominatimRepository.kt   # Ortssuche via Nominatim (OpenStreetMap)
     data/LocationHelper.kt        # einmaliger Standort via LocationManager
+    ui/GlobeView.kt               # 3D-Globus (Bitmap-Rendering der Erdkugel)
+  src/main/res/drawable-nodpi/earth.jpg  # Globus-Textur: NASA Blue Marble (Public Domain), via three.js examples
 ```
 
 ## Lokal bauen
@@ -56,3 +59,4 @@ Hinweis: Ist `gradlew` nicht committet, erzeugen die CI-Workflows den Wrapper vo
 - Karten © [OpenStreetMap-Mitwirkende](https://www.openstreetmap.org/copyright) (ODbL)
 - Kacheln: openstreetmap.org (Tile-Usage-Policy wird eingehalten, User-Agent ist in der App gesetzt)
 - Ortssuche: [Nominatim](https://nominatim.openstreetmap.org/) (nur bei Nutzereingabe, max. 1 Anfrage/s)
+- Globus-Textur: NASA Blue Marble (Public Domain), bezogen aus den [three.js-Beispielen](https://github.com/mrdoob/three.js/tree/dev/examples/textures/planets)
