@@ -145,26 +145,7 @@ fun MapScreen() {
         mv.invalidate()
     }
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        if (permissions.values.any { it }) {
-            locate()
-        } else {
-            Toast.makeText(context, R.string.permission_denied, Toast.LENGTH_LONG).show()
-        }
-    }
-
-    fun locate() {
-        if (!LocationHelper.hasPermission(context)) {
-            permissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            )
-            return
-        }
+    fun doLocate() {
         scope.launch {
             loading = true
             val location = withTimeoutOrNull(20000) { LocationHelper.awaitLocation(context) }
@@ -174,6 +155,29 @@ fun MapScreen() {
             } else {
                 showHere(location)
             }
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions.values.any { it }) {
+            doLocate()
+        } else {
+            Toast.makeText(context, R.string.permission_denied, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    fun onLocateClick() {
+        if (LocationHelper.hasPermission(context)) {
+            doLocate()
+        } else {
+            permissionLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
         }
     }
 
@@ -277,7 +281,7 @@ fun MapScreen() {
         }
 
         FloatingActionButton(
-            onClick = { locate() },
+            onClick = { onLocateClick() },
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(16.dp),
