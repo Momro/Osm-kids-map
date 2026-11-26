@@ -13,7 +13,7 @@
     <string name="you_are_here">Du bist hier!</string>
     <string name="permission_denied">Ohne Standort-Erlaubnis kann ich nicht zeigen, wo du bist 😕</string>
     <string name="info_title">Über diese App</string>
-    <string name="info_message">Welt-Entdecker ist eine kostenlose Karten-App für Kinder – eine Alternative zu Google Earth.\n\n• Kein Login, keine Werbung, kein Tracking – es werden keine Daten gesammelt oder verschickt.\n• Dein Standort wird nur lokal auf der Karte angezeigt und nicht gespeichert.\n• Karten: © OpenStreetMap-Mitwirkende (ODbL), Kacheln von openstreetmap.org\n• Ortssuche: Nominatim (OpenStreetMap)\n\nTipp: Zoome mit zwei Fingern oder den großen +/−-Knöpfen!</string>
+    <string name="info_message">Welt-Entdecker ist eine kostenlose Karten-App für Kinder – eine Alternative zu Google Earth.\n\n• Kein Login, keine Werbung, kein Tracking – es werden keine Daten gesammelt oder verschickt.\n• Dein Standort wird nur lokal auf der Karte angezeigt und nicht gespeichert.\n• Karte: OpenTopoMap (topografische Landkarte) – © OpenStreetMap-Mitwirkende (ODbL), © OpenTopoMap (CC-BY-SA)\n• Ortssuche: Nominatim (OpenStreetMap)\n\nTipp: Zoome mit zwei Fingern oder den großen +/−-Knöpfen!</string>
     <string name="close">Schließen</string>
     <string name="globe_hint">🌍 Wisch seitlich zum Drehen! Tippe oder drücke +, um ran zu zoomen</string>
 </resources>

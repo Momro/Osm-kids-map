@@ -68,12 +68,28 @@ import kotlinx.coroutines.withTimeoutOrNull
 import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
-import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 
 private data class ChipItem(val label: String, val query: String)
+
+private val topoTileSource = object : OnlineTileSourceBase(
+    "OpenTopoMap",
+    0,
+    17,
+    256,
+    ".png",
+    arrayOf(
+        "https://a.tile.opentopomap.org/",
+        "https://b.tile.opentopomap.org/",
+        "https://c.tile.opentopomap.org/"
+    )
+) {
+    override fun getTileURLString(pMapTileIndex: Long): String =
+        "$baseUrl${getLevel(pMapTileIndex)}/${getX(pMapTileIndex)}/${getY(pMapTileIndex)}$imageFilenameEnding"
+}
 
 private val chips = listOf(
     ChipItem("🦁 Zoo", "Zoo"),
@@ -193,7 +209,7 @@ fun MapScreen() {
             modifier = Modifier.fillMaxSize(),
             factory = { ctx ->
                 MapView(ctx).apply {
-                    setTileSource(TileSourceFactory.MAPNIK)
+                    setTileSource(topoTileSource)
                     setMultiTouchControls(true)
                     setBuiltInZoomControls(false)
                     minZoomLevel = 3.0
