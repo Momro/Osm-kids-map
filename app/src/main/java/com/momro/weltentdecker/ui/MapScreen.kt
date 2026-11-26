@@ -98,7 +98,7 @@ fun MapScreen() {
     var showInfo by remember { mutableStateOf(false) }
     var searchMarker by remember { mutableStateOf<Marker?>(null) }
     var hereMarker by remember { mutableStateOf<Marker?>(null) }
-    var showGlobe by remember { mutableStateOf(false) }
+    var showGlobe by remember { mutableStateOf(true) }
     val earthTexture = remember { BitmapFactory.decodeResource(context.resources, R.drawable.earth) }
 
     fun doSearch(term: String = query) {
@@ -198,11 +198,11 @@ fun MapScreen() {
                     setBuiltInZoomControls(false)
                     minZoomLevel = 3.0
                     maxZoomLevel = 19.0
-                    controller.setZoom(6.0)
+                    controller.setZoom(4.5)
                     controller.setCenter(GeoPoint(51.1657, 10.4515))
                     addMapListener(object : MapListener {
                         override fun onZoom(event: ZoomEvent?): Boolean {
-                            showGlobe = zoomLevelDouble < 5.0
+                            showGlobe = zoomLevelDouble < 7.0
                             return false
                         }
 

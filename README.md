@@ -6,7 +6,7 @@ Kinderfreundliche Karten-App als Alternative zu Google Earth – mit Karten von 
 ## Funktionen
 
 - Vollbild-Karte mit OpenStreetMap-Kacheln (osmdroid, Mapnik)
-- **3D-Globus**: Zoomt man weit genug raus (Zoom < 5), erscheint eine Erdkugel im Weltraum – per Wischen seitlich drehbar (dreht sich auch langsam von allein), Tippen oder + drücken holt die Karte zurück
+- **3D-Globus**: Die App startet auf einer Erdkugel im Weltraum; sie bleibt bis Zoom 7 sichtbar. Per Wischen seitlich drehbar (keine Eigenrotation), Tippen oder + drücken holt die Landkarte hervor
 - Große, einfache Knöpfe: **+ / −** (Zoomen) und **„Wo bin ich?"** (Standort wird nur lokal angezeigt)
 - Zoomen auch per Zwei-Finger-Geste
 - Ortssuche (Nominatim/OpenStreetMap) plus Kinder-Chips: 🦁 Zoo, 🌳 Spielplatz, 🏰 Schloss, 🎢 Freizeitpark, 🏙️ Hochhaus, 🏛️ Akropolis

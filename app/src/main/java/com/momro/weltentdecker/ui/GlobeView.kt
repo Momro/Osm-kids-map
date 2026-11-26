@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,7 +32,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.momro.weltentdecker.R
-import kotlinx.coroutines.delay
 import kotlin.math.PI
 import kotlin.math.asin
 import kotlin.math.ceil
@@ -47,13 +45,6 @@ fun GlobeOverlay(texture: Bitmap, onTap: () -> Unit = {}, modifier: Modifier = M
     var phase by remember { mutableStateOf(0f) }
     val texWf = texture.width.toFloat()
 
-    LaunchedEffect(texture) {
-        while (true) {
-            delay(66)
-            phase = (phase + 2f) % texWf
-        }
-    }
-
     val globe = remember(texture, phase) { renderGlobeBitmap(texture, phase) }
 
     Box(modifier = modifier.fillMaxSize().background(Color(0xFF050A18))) {
@@ -64,13 +55,15 @@ fun GlobeOverlay(texture: Bitmap, onTap: () -> Unit = {}, modifier: Modifier = M
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(texture) {
-                    detectTapGestures(onTap = { onTap() })
                     detectDragGestures { change, drag ->
                         change.consume()
                         val d = minOf(size.width, size.height)
                         val v = phase + drag.x * texWf / (PI.toFloat() * d)
                         phase = ((v % texWf) + texWf) % texWf
                     }
+                }
+                .pointerInput(Unit) {
+                    detectTapGestures(onTap = { onTap() })
                 }
         )
         Text(
