@@ -1,13 +1,14 @@
 package com.momro.weltentdecker.ui
 
 import android.graphics.Bitmap
-import android.graphics.Canvas
+import android.graphics.Canvas as AndroidCanvas
+import android.graphics.Color as AndroidColor
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RadialGradient
+import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Shader
-import android.graphics.Color as AndroidColor
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,17 +18,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.momro.weltentdecker.R
 import kotlin.math.PI
 import kotlin.math.asin
 import kotlin.math.cos
+import kotlin.math.roundToInt
 
 private const val GLOBE_SIZE = 1024
 
@@ -38,11 +38,15 @@ fun GlobeOverlay(texture: Bitmap, modifier: Modifier = Modifier) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             drawRect(Color(0xFF050A18))
             val d = minOf(size.width, size.height) * 0.9f
-            drawImage(
-                globe.asImageBitmap(),
-                dstOffset = Offset((size.width - d) / 2f, (size.height - d) / 2f),
-                dstSize = IntSize(d.toInt(), d.toInt())
+            val dst = RectF(
+                (size.width - d) / 2f,
+                (size.height - d) / 2f,
+                (size.width + d) / 2f,
+                (size.height + d) / 2f
             )
+            drawIntoCanvas { canvas ->
+                canvas.nativeCanvas.drawBitmap(globe, null, dst, null)
+            }
         }
         Text(
             text = stringResource(R.string.globe_hint),
@@ -57,10 +61,10 @@ fun GlobeOverlay(texture: Bitmap, modifier: Modifier = Modifier) {
 
 private fun renderGlobeBitmap(texture: Bitmap, outSize: Int = GLOBE_SIZE): Bitmap {
     val out = Bitmap.createBitmap(outSize, outSize, Bitmap.Config.ARGB_8888)
-    val canvas = Canvas(out)
+    val canvas = AndroidCanvas(out)
     val r = outSize / 2f
-    val texW = texture.width.toFloat()
-    val texH = texture.height.toFloat()
+    val texW = texture.width
+    val texH = texture.height
 
     val glowPaint = Paint().apply {
         shader = RadialGradient(
@@ -76,7 +80,7 @@ private fun renderGlobeBitmap(texture: Bitmap, outSize: Int = GLOBE_SIZE): Bitma
     canvas.clipPath(Path().apply { addCircle(r, r, r, Path.Direction.CW) })
 
     val slicePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { isFilterBitmap = true }
-    val src = RectF()
+    val src = Rect()
     val dst = RectF()
     for (i in 0 until outSize) {
         val u = (i + 0.5f - r) / r
@@ -85,12 +89,10 @@ private fun renderGlobeBitmap(texture: Bitmap, outSize: Int = GLOBE_SIZE): Bitma
         val texX = ((lon + PI) / (2.0 * PI)).toFloat() * texW
         val cosLon = cos(lon).toFloat()
         val dTex = (texW / (2.0 * PI * r * cosLon)).toFloat() * 1.5f
-        src.set(
-            (texX - dTex / 2).coerceIn(0f, texW),
-            0f,
-            (texX + dTex / 2).coerceIn(0f, texW),
-            texH
-        )
+        val left = (texX - dTex / 2).coerceIn(0f, texW.toFloat()).roundToInt()
+        val right = (texX + dTex / 2).coerceIn(0f, texW.toFloat()).roundToInt()
+        if (right <= left) continue
+        src.set(left, 0, right, texH)
         dst.set(i.toFloat(), 0f, i + 1f, outSize.toFloat())
         canvas.drawBitmap(texture, src, dst, slicePaint)
     }
