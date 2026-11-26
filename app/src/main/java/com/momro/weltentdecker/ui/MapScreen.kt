@@ -69,6 +69,7 @@ import org.osmdroid.events.MapListener
 import org.osmdroid.events.ScrollEvent
 import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
+import org.osmdroid.util.MapTileIndex
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
@@ -88,7 +89,7 @@ private val topoTileSource = object : OnlineTileSourceBase(
     )
 ) {
     override fun getTileURLString(pMapTileIndex: Long): String =
-        "$baseUrl${getLevel(pMapTileIndex)}/${getX(pMapTileIndex)}/${getY(pMapTileIndex)}$imageFilenameEnding"
+        "$baseUrl${MapTileIndex.getLevel(pMapTileIndex)}/${MapTileIndex.getX(pMapTileIndex)}/${MapTileIndex.getY(pMapTileIndex)}.png"
 }
 
 private val chips = listOf(
