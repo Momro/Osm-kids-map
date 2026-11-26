@@ -145,6 +145,16 @@ fun MapScreen() {
         mv.invalidate()
     }
 
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions.values.any { it }) {
+            locate()
+        } else {
+            Toast.makeText(context, R.string.permission_denied, Toast.LENGTH_LONG).show()
+        }
+    }
+
     fun locate() {
         if (!LocationHelper.hasPermission(context)) {
             permissionLauncher.launch(
@@ -164,16 +174,6 @@ fun MapScreen() {
             } else {
                 showHere(location)
             }
-        }
-    }
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        if (permissions.values.any { it }) {
-            locate()
-        } else {
-            Toast.makeText(context, R.string.permission_denied, Toast.LENGTH_LONG).show()
         }
     }
 
