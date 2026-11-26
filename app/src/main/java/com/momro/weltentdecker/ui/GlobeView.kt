@@ -9,7 +9,8 @@ import android.graphics.RadialGradient
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Shader
-import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,7 +20,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,20 +36,13 @@ private const val GLOBE_SIZE = 1024
 @Composable
 fun GlobeOverlay(texture: Bitmap, modifier: Modifier = Modifier) {
     val globe = remember(texture) { renderGlobeBitmap(texture) }
-    Box(modifier = modifier.fillMaxSize()) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            drawRect(Color(0xFF050A18))
-            val d = minOf(size.width, size.height) * 0.9f
-            val dst = RectF(
-                (size.width - d) / 2f,
-                (size.height - d) / 2f,
-                (size.width + d) / 2f,
-                (size.height + d) / 2f
-            )
-            drawIntoCanvas { canvas ->
-                canvas.nativeCanvas.drawBitmap(globe, null, dst, null)
-            }
-        }
+    Box(modifier = modifier.fillMaxSize().background(Color(0xFF050A18))) {
+        Image(
+            bitmap = globe.asImageBitmap(),
+            contentDescription = null,
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.fillMaxSize()
+        )
         Text(
             text = stringResource(R.string.globe_hint),
             color = Color.White,
