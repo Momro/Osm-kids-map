@@ -11,37 +11,67 @@ import android.graphics.RectF
 import android.graphics.Shader
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.momro.weltentdecker.R
+import kotlinx.coroutines.delay
 import kotlin.math.PI
 import kotlin.math.asin
+import kotlin.math.ceil
 import kotlin.math.cos
-import kotlin.math.roundToInt
+import kotlin.math.floor
 
-private const val GLOBE_SIZE = 1024
+private const val GLOBE_SIZE = 768
 
 @Composable
-fun GlobeOverlay(texture: Bitmap, modifier: Modifier = Modifier) {
-    val globe = remember(texture) { renderGlobeBitmap(texture) }
+fun GlobeOverlay(texture: Bitmap, onTap: () -> Unit = {}, modifier: Modifier = Modifier) {
+    var phase by remember { mutableStateOf(0f) }
+    val texW = texture.width
+
+    LaunchedEffect(texture) {
+        while (true) {
+            delay(66)
+            phase = (phase + 2f) % texW
+        }
+    }
+
+    val globe = remember(texture, phase) { renderGlobeBitmap(texture, phase) }
+
     Box(modifier = modifier.fillMaxSize().background(Color(0xFF050A18))) {
         Image(
             bitmap = globe.asImageBitmap(),
             contentDescription = null,
             contentScale = ContentScale.Fit,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(texture) {
+                    detectTapGestures(onTap = { onTap() })
+                    detectDragGestures { change, drag ->
+                        change.consume()
+                        val d = minOf(size.width, size.height)
+                        val v = phase + drag.x * texW / (PI * d)
+                        phase = ((v % texW) + texW) % texW
+                    }
+                }
         )
         Text(
             text = stringResource(R.string.globe_hint),
@@ -54,7 +84,7 @@ fun GlobeOverlay(texture: Bitmap, modifier: Modifier = Modifier) {
     }
 }
 
-private fun renderGlobeBitmap(texture: Bitmap, outSize: Int = GLOBE_SIZE): Bitmap {
+private fun renderGlobeBitmap(texture: Bitmap, phaseTex: Float, outSize: Int = GLOBE_SIZE): Bitmap {
     val out = Bitmap.createBitmap(outSize, outSize, Bitmap.Config.ARGB_8888)
     val canvas = AndroidCanvas(out)
     val r = outSize / 2f
@@ -63,13 +93,13 @@ private fun renderGlobeBitmap(texture: Bitmap, outSize: Int = GLOBE_SIZE): Bitma
 
     val glowPaint = Paint().apply {
         shader = RadialGradient(
-            r, r, r * 1.18f,
-            AndroidColor.argb(90, 70, 130, 255),
+            r, r, r * 1.15f,
+            AndroidColor.argb(80, 80, 150, 255),
             AndroidColor.TRANSPARENT,
             Shader.TileMode.CLAMP
         )
     }
-    canvas.drawCircle(r, r, r * 1.18f, glowPaint)
+    canvas.drawCircle(r, r, r * 1.15f, glowPaint)
 
     canvas.save()
     canvas.clipPath(Path().apply { addCircle(r, r, r, Path.Direction.CW) })
@@ -77,26 +107,31 @@ private fun renderGlobeBitmap(texture: Bitmap, outSize: Int = GLOBE_SIZE): Bitma
     val slicePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { isFilterBitmap = true }
     val src = Rect()
     val dst = RectF()
-    for (i in 0 until outSize) {
-        val u = (i + 0.5f - r) / r
-        if (u <= -1f || u >= 1f) continue
-        val lon = asin(u.toDouble())
-        val texX = ((lon + PI) / (2.0 * PI)).toFloat() * texW
-        val cosLon = cos(lon).toFloat()
-        val dTex = (texW / (2.0 * PI * r * cosLon)).toFloat() * 1.5f
-        val left = (texX - dTex / 2).coerceIn(0f, texW.toFloat()).roundToInt()
-        val right = (texX + dTex / 2).coerceIn(0f, texW.toFloat()).roundToInt()
-        if (right <= left) continue
-        src.set(left, 0, right, texH)
-        dst.set(i.toFloat(), 0f, i + 1f, outSize.toFloat())
-        canvas.drawBitmap(texture, src, dst, slicePaint)
+    val step = 2
+    var i = 0
+    while (i < outSize) {
+        val u = (i + step / 2f - r) / r
+        if (u > -1f && u < 1f) {
+            val lon = asin(u.toDouble())
+            val raw = ((lon + PI) / (2.0 * PI)).toFloat() * texW + phaseTex
+            val texCenter = ((raw % texW) + texW) % texW
+            val cosLon = cos(lon).toFloat().coerceAtLeast(0.05f)
+            val dTex = (texW / (2.0 * PI * r * cosLon) * step).toFloat()
+            val left = floor((texCenter - dTex / 2).toDouble()).toInt().coerceIn(0, texW - 1)
+            var right = ceil((texCenter + dTex / 2).toDouble()).toInt().coerceIn(1, texW)
+            if (right <= left) right = left + 1
+            src.set(left, 0, right, texH)
+            dst.set(i.toFloat(), 0f, (i + step).toFloat(), outSize.toFloat())
+            canvas.drawBitmap(texture, src, dst, slicePaint)
+        }
+        i += step
     }
 
     val shadePaint = Paint().apply {
         shader = RadialGradient(
             r, r, r,
             AndroidColor.TRANSPARENT,
-            AndroidColor.argb(150, 0, 0, 10),
+            AndroidColor.argb(90, 0, 0, 20),
             Shader.TileMode.CLAMP
         )
     }
@@ -104,8 +139,8 @@ private fun renderGlobeBitmap(texture: Bitmap, outSize: Int = GLOBE_SIZE): Bitma
 
     val highlightPaint = Paint().apply {
         shader = RadialGradient(
-            r * 0.72f, r * 0.68f, r * 0.85f,
-            AndroidColor.argb(70, 255, 255, 255),
+            r * 0.7f, r * 0.65f, r * 0.8f,
+            AndroidColor.argb(80, 255, 255, 255),
             AndroidColor.TRANSPARENT,
             Shader.TileMode.CLAMP
         )
@@ -113,5 +148,12 @@ private fun renderGlobeBitmap(texture: Bitmap, outSize: Int = GLOBE_SIZE): Bitma
     canvas.drawCircle(r, r, r, highlightPaint)
 
     canvas.restore()
+
+    val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = outSize / 128f
+        color = AndroidColor.argb(110, 120, 180, 255)
+    }
+    canvas.drawCircle(r, r, r - ringPaint.strokeWidth / 2, ringPaint)
     return out
 }

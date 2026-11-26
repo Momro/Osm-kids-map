@@ -219,7 +219,11 @@ fun MapScreen() {
         }
 
         if (showGlobe && earthTexture != null) {
-            GlobeOverlay(texture = earthTexture, modifier = Modifier.fillMaxSize())
+            GlobeOverlay(
+                texture = earthTexture,
+                onTap = { mapView?.controller?.zoomIn() },
+                modifier = Modifier.fillMaxSize()
+            )
         }
 
         Column(
